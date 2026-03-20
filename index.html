@@ -3,12 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <link rel="manifest" href="manifest.json">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Poshan SAM MAM">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#1B5E20">
+<meta name="theme-color" content="#1B5E20">
 <title>Poshan SAM MAM Calculator</title>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -55,6 +50,13 @@ body{font-family:'Baloo 2',sans-serif;background:var(--bg);color:var(--text);pad
 .unit-wrap{display:flex;}
 .unit-wrap .inp{border-radius:9px 0 0 9px;border-right:none;}
 .unit-tag{min-width:44px;background:#E8EEF9;border:2px solid #E0E7FF;border-left:none;border-radius:0 9px 9px 0;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;color:var(--blue);}
+
+
+.mdate-row{display:flex;gap:8px;align-items:center;}
+.mdate-row .inp{flex:1;}
+.btn-today{height:48px;padding:0 14px;background:var(--primary);color:#fff;border:none;border-radius:9px;font-family:inherit;font-size:0.85rem;font-weight:800;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s;}
+.btn-today:active{background:var(--primary-mid);}
+.btn-today.active{background:#1565C0;box-shadow:0 0 0 3px rgba(21,101,192,0.25);}
 
 /* ── AGE BOX ── */
 .age-box{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;align-items:center;gap:10px;}
@@ -239,6 +241,16 @@ body{font-family:'Baloo 2',sans-serif;background:var(--bg);color:var(--text);pad
       <div class="age-table-badge" id="age-table-badge">—</div>
     </div>
     <div class="age-warn" id="age-warn"></div>
+    <div class="field" style="margin-top:10px;">
+      <label>माप की तारीख <span class="hi">/ Measurement Date</span></label>
+      <div class="mdate-row">
+        <input class="inp" id="inp-mdate" type="date" onchange="onMdateChange()">
+        <button class="btn-today" id="btn-today" onclick="setToday()">📅 आज</button>
+      </div>
+      <div style="font-size:0.7rem;color:#90A4AE;margin-top:5px;font-weight:500;" id="mdate-hint">
+        💡 "आज" click करें या पिछली date डालें
+      </div>
+    </div>
 
     <!-- Age-based Range Box (NEW) -->
     <div class="range-box" id="range-box">
@@ -497,7 +509,9 @@ function onDobChange() {
   const dob = document.getElementById('inp-dob').value;
   if (!dob) { hideAgeBox(); return; }
   const dobDate = new Date(dob);
-  const today   = new Date();
+  // Use measurement date if provided, else today
+  const mdateVal = document.getElementById('inp-mdate').value;
+  const today = mdateVal ? new Date(mdateVal) : new Date();
   if (dobDate > today) {
     hideAgeBox();
     showWarn('⚠️ जन्म तिथि भविष्य की नहीं हो सकती');
@@ -512,7 +526,8 @@ function onDobChange() {
 
   const yShow = Math.floor(ageMonths / 12), mShow = ageMonths % 12;
   document.getElementById('age-val').textContent  = (yShow > 0 ? yShow + ' साल ' : '') + mShow + ' महीने';
-  document.getElementById('age-sub').textContent  = 'उम्र = ' + ageMonths + ' months';
+  const mdStr = mdateVal ? ' (माप: ' + mdateVal + ')' : ' (आज)';
+  document.getElementById('age-sub').textContent  = 'उम्र = ' + ageMonths + ' months' + mdStr;
   document.getElementById('age-table-badge').textContent = ageMonths < 24 ? '0-2 yrs' : '2-5 yrs';
   document.getElementById('age-box').classList.add('show');
 
@@ -528,6 +543,9 @@ function onDobChange() {
 
 function hideAgeBox() {
   document.getElementById('age-box').classList.remove('show');
+  document.getElementById('btn-today').classList.remove('active');
+  document.getElementById('mdate-hint').textContent = '💡 "आज" click करें या पिछली date डालें';
+  document.getElementById('mdate-hint').style.color = '#90A4AE';
   document.getElementById('range-box').classList.remove('show');
   ageMonths = null;
 }
@@ -603,6 +621,43 @@ function updateRangeChips() {
     `<span class="range-chip ${wChip}">${wStatus}</span>`;
 }
 
+function setToday() {
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth()+1).padStart(2,'0');
+  const d = String(today.getDate()).padStart(2,'0');
+  const todayStr = y+'-'+m+'-'+d;
+  document.getElementById('inp-mdate').value = todayStr;
+  document.getElementById('btn-today').classList.add('active');
+  document.getElementById('mdate-hint').textContent = '✅ आज की तारीख: ' + d+'/'+m+'/'+y;
+  document.getElementById('mdate-hint').style.color = '#1B5E20';
+  onDobChange();
+}
+
+function onMdateChange() {
+  const val = document.getElementById('inp-mdate').value;
+  const btn = document.getElementById('btn-today');
+  const hint = document.getElementById('mdate-hint');
+  // Check if selected date is today
+  const today = new Date();
+  const todayStr = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+  if (val === todayStr) {
+    btn.classList.add('active');
+    hint.textContent = '✅ आज की तारीख चुनी है';
+    hint.style.color = '#1B5E20';
+  } else if (val) {
+    btn.classList.remove('active');
+    const parts = val.split('-');
+    hint.textContent = '📅 पिछली तारीख: ' + parts[2]+'/'+parts[1]+'/'+parts[0];
+    hint.style.color = '#1565C0';
+  } else {
+    btn.classList.remove('active');
+    hint.textContent = '💡 "आज" click करें या पिछली date डालें';
+    hint.style.color = '#90A4AE';
+  }
+  onDobChange();
+}
+
 function selG(g) {
   gdr = g;
   document.getElementById('btn-boy').classList.toggle('sel', g === 'boy');
@@ -629,6 +684,8 @@ function calculate() {
   const dob    = document.getElementById('inp-dob').value;
   const height = parseFloat(document.getElementById('inp-height').value);
   const weight = parseFloat(document.getElementById('inp-weight').value);
+  // Re-calculate age using measurement date if changed
+  onDobChange();
 
   let ok = true;
   setErr('err-name',   !name);                                     if (!name) ok = false;
@@ -757,7 +814,7 @@ function calculate() {
 }
 
 function resetForm() {
-  ['inp-name','inp-dob','inp-height','inp-weight'].forEach(id => {
+  ['inp-name','inp-dob','inp-mdate','inp-height','inp-weight'].forEach(id => {
     document.getElementById(id).value = '';
     document.getElementById(id).classList.remove('err');
   });
@@ -779,16 +836,6 @@ function resetForm() {
 let dp;
 window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp=e; document.getElementById('ib').classList.add('show'); });
 document.getElementById('ib-btn').addEventListener('click', async()=>{ if(dp){ dp.prompt(); await dp.userChoice; dp=null; document.getElementById('ib').classList.remove('show'); }});
-</script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('SW OK'))
-      .catch(e => console.log('SW error', e));
-  });
-}
 </script>
 </body>
 </html>
