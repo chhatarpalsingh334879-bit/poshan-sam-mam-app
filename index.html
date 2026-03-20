@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Poshan SAM MAM">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#1B5E20">
+<title>Poshan SAM MAM Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1B5E20;--primary-mid:#2E7D32;--primary-light:#E8F5E9;
+  --blue:#1565C0;
+  --sam:#B71C1C;--sam-bg:#FFEBEE;--sam-border:#EF9A9A;
+  --mam:#E65100;--mam-bg:#FFF3E0;--mam-border:#FFCC80;
+  --ok:#1B5E20;--ok-bg:#E8F5E9;--ok-border:#A5D6A7;
+  --ow:#6A1B9A;--ow-bg:#F3E5F5;--ow-border:#CE93D8;
+  --stunt-sev:#880E4F;--stunt-mod:#AD1457;--stunt-ok:#00695C;
+  --text:#1A1A2E;--muted:#607D8B;--surface:#fff;
+  --bg:#F1F8E9;--radius:14px;--shadow:0 3px 16px rgba(27,94,32,0.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Baloo 2',sans-serif;background:var(--bg);color:var(--text);padding-bottom:40px;}
+
+/* ── HEADER ── */
+.header{background:linear-gradient(150deg,#1B5E20 0%,#2E7D32 55%,#388E3C 100%);padding:22px 18px 36px;text-align:center;position:relative;overflow:hidden;}
+.header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:24px;background:var(--bg);border-radius:24px 24px 0 0;}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 75% 25%,rgba(255,255,255,0.07) 0%,transparent 60%);}
+.h-icon{width:66px;height:66px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;border:2px solid rgba(255,255,255,0.25);font-size:30px;position:relative;}
+.header h1{color:#fff;font-size:1.15rem;font-weight:800;position:relative;line-height:1.3;}
+.header p{color:rgba(255,255,255,0.72);font-size:0.77rem;margin-top:4px;position:relative;}
+.badges{display:flex;gap:7px;justify-content:center;margin-top:10px;flex-wrap:wrap;position:relative;}
+.badge{background:rgba(255,255,255,0.15);color:#fff;font-size:0.67rem;font-weight:700;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,255,255,0.25);}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 16px;margin:0 13px 13px;}
+.card:first-of-type{margin-top:-12px;}
+.sec-head{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.sec-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.si-green{background:#E8F5E9;}.si-blue{background:#E3F2FD;}.si-purple{background:#F3E5F5;}.si-teal{background:#E0F7FA;}.si-orange{background:#FFF3E0;}
+.sec-title{font-size:0.88rem;font-weight:800;color:var(--primary);}
+.sec-sub{font-size:0.7rem;color:var(--muted);font-weight:500;}
+
+/* ── FIELDS ── */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:0.78rem;font-weight:700;color:#455A64;margin-bottom:5px;}
+.hi{color:var(--muted);font-weight:500;font-size:0.73rem;}
+.inp{width:100%;height:48px;border:2px solid #E0E7FF;border-radius:9px;padding:0 12px;font-family:inherit;font-size:0.98rem;font-weight:600;color:var(--text);background:#F8FAFF;outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+.inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(21,101,192,0.10);background:#fff;}
+.inp.err{border-color:#EF5350;}
+.unit-wrap{display:flex;}
+.unit-wrap .inp{border-radius:9px 0 0 9px;border-right:none;}
+.unit-tag{min-width:44px;background:#E8EEF9;border:2px solid #E0E7FF;border-left:none;border-radius:0 9px 9px 0;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800;color:var(--blue);}
+
+/* ── AGE BOX ── */
+.age-box{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);border:1.5px solid #A5D6A7;border-radius:10px;padding:10px 14px;margin-top:8px;display:none;align-items:center;gap:10px;}
+.age-box.show{display:flex;}
+.age-val{font-size:1.05rem;font-weight:800;color:var(--primary);}
+.age-sub{font-size:0.72rem;color:var(--muted);font-weight:500;}
+.age-table-badge{background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:3px 8px;border-radius:12px;margin-left:auto;white-space:nowrap;}
+.age-warn{background:#FFF8E1;border:1.5px solid #FFB300;border-radius:9px;padding:8px 12px;margin-top:7px;font-size:0.75rem;color:#5D4037;font-weight:600;display:none;}
+.age-warn.show{display:block;}
+
+/* ── AGE RANGE BOX (NEW) ── */
+.range-box{display:none;margin-top:10px;border-radius:10px;overflow:hidden;border:1.5px solid #B0BEC5;}
+.range-box.show{display:block;}
+.range-header{background:#455A64;color:#fff;font-size:0.75rem;font-weight:800;padding:7px 12px;letter-spacing:0.3px;}
+.range-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.range-cell{padding:10px 12px;border-bottom:1px solid #ECEFF1;}
+.range-cell:nth-child(odd){border-right:1px solid #ECEFF1;}
+.range-cell-label{font-size:0.68rem;font-weight:700;color:#607D8B;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px;}
+.range-cell-val{font-size:0.88rem;font-weight:800;color:var(--text);}
+.range-cell-val.green{color:#1B5E20;}
+.range-cell-val.amber{color:#E65100;}
+.range-cell-val.red{color:#B71C1C;}
+.range-status-row{padding:10px 12px;background:#FAFAFA;border-top:1px solid #ECEFF1;}
+.range-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;margin:2px;}
+.chip-ok{background:#E8F5E9;color:#1B5E20;border:1.5px solid #A5D6A7;}
+.chip-warn{background:#FFF3E0;color:#E65100;border:1.5px solid #FFCC80;}
+.chip-bad{background:#FFEBEE;color:#B71C1C;border:1.5px solid #EF9A9A;}
+.chip-ow{background:#F3E5F5;color:#6A1B9A;border:1.5px solid #CE93D8;}
+
+/* ── GENDER ── */
+.g-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.g-btn{height:48px;border:2px solid #E0E7FF;border-radius:9px;background:#F8FAFF;font-family:inherit;font-size:0.88rem;font-weight:700;cursor:pointer;transition:all .18s;color:#607D8B;display:flex;align-items:center;justify-content:center;gap:6px;}
+.g-btn.boy.sel{background:#E3F2FD;border-color:#1565C0;color:#1565C0;}
+.g-btn.girl.sel{background:#FCE4EC;border-color:#AD1457;color:#AD1457;}
+.g-btn:active{transform:scale(0.97);}
+
+/* ── OEDEMA ── */
+.oe-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.oe-btn{height:48px;border:2px solid #E0E7FF;border-radius:9px;background:#F8FAFF;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;transition:all .18s;color:#607D8B;display:flex;align-items:center;justify-content:center;gap:5px;}
+.oe-btn.yes.sel{background:#FFEBEE;border-color:#C62828;color:#C62828;}
+.oe-btn.no.sel{background:#E8F5E9;border-color:#2E7D32;color:#2E7D32;}
+.oe-btn:active{transform:scale(0.97);}
+.oe-tip{background:#FFF8E1;border-radius:8px;padding:9px 11px;font-size:0.75rem;color:#5D4037;line-height:1.55;margin-top:7px;border-left:3px solid #FFB300;font-weight:500;}
+
+/* ── BUTTONS ── */
+.btn-calc{width:100%;height:54px;background:linear-gradient(135deg,var(--primary) 0%,var(--primary-mid) 100%);color:#fff;border:none;border-radius:11px;font-family:inherit;font-size:1.02rem;font-weight:800;cursor:pointer;margin-top:4px;box-shadow:0 4px 14px rgba(27,94,32,0.30);transition:transform .15s,box-shadow .15s;}
+.btn-calc:active{transform:scale(0.98);box-shadow:0 2px 7px rgba(27,94,32,0.2);}
+.btn-reset{width:100%;height:44px;background:transparent;color:var(--primary);border:2px solid #A5D6A7;border-radius:11px;font-family:inherit;font-size:0.92rem;font-weight:700;cursor:pointer;margin-top:9px;}
+.btn-reset:active{background:#E8F5E9;}
+
+/* ── ERRORS ── */
+.err-msg{font-size:0.72rem;color:#EF5350;font-weight:600;margin-top:3px;display:none;}
+.err-msg.show{display:block;}
+
+/* ── RESULTS ── */
+.result-wrap{margin:0 13px 13px;display:none;animation:popIn .35s cubic-bezier(.22,.68,0,1.2);}
+.result-wrap.show{display:block;}
+@keyframes popIn{from{opacity:0;transform:translateY(16px) scale(0.97);}to{opacity:1;transform:none;}}
+
+/* Result banner */
+.res-banner{border-radius:var(--radius);padding:18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;}
+.res-banner.sam{background:var(--sam-bg);border:2.5px solid var(--sam-border);}
+.res-banner.mam{background:var(--mam-bg);border:2.5px solid var(--mam-border);}
+.res-banner.norm{background:var(--ok-bg);border:2.5px solid var(--ok-border);}
+.res-banner.ow{background:var(--ow-bg);border:2.5px solid var(--ow-border);}
+.res-circle{width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;box-shadow:0 3px 12px rgba(0,0,0,0.18);}
+.sam .res-circle{background:var(--sam);}
+.mam .res-circle{background:var(--mam);}
+.norm .res-circle{background:var(--ok);}
+.ow .res-circle{background:var(--ow);}
+.res-name{font-size:0.9rem;font-weight:700;color:#333;margin-bottom:2px;}
+.res-status{font-size:1.55rem;font-weight:800;line-height:1;}
+.sam .res-status{color:var(--sam);}
+.mam .res-status{color:var(--mam);}
+.norm .res-status{color:var(--ok);}
+.ow .res-status{color:var(--ow);}
+
+/* Wasting detail */
+.detail-card{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:10px;}
+.dt-title{font-size:0.7rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;}
+.dt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #F0F0F0;font-size:0.82rem;}
+.dt-row:last-child{border-bottom:none;}
+.dt-label{color:#607D8B;font-weight:600;}
+.dt-val{font-weight:800;}
+.dt-val.sam-c{color:var(--sam);}
+.dt-val.mam-c{color:var(--mam);}
+.dt-val.ok-c{color:var(--ok);}
+.dt-val.ow-c{color:var(--ow);}
+.dt-val.stunt-sev-c{color:var(--stunt-sev);}
+.dt-val.stunt-mod-c{color:var(--stunt-mod);}
+
+/* Cutoff bar */
+.cutoff-bar{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:10px;}
+.cb-title{font-size:0.7rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.cb-scale{position:relative;height:14px;border-radius:7px;background:linear-gradient(to right,#C62828 0%,#C62828 var(--pct-sam),#E65100 var(--pct-sam),#E65100 var(--pct-mam),#1B5E20 var(--pct-mam),#1B5E20 var(--pct-norm),#6A1B9A var(--pct-norm),#6A1B9A 100%);margin-bottom:8px;}
+.cb-needle{position:absolute;top:-4px;width:4px;height:22px;background:#1A1A2E;border-radius:2px;transform:translateX(-50%);transition:left 0.5s ease;}
+.cb-labels{display:flex;justify-content:space-between;font-size:0.68rem;font-weight:700;color:#555;}
+.cb-weight{text-align:center;font-size:0.8rem;font-weight:800;margin-top:8px;color:var(--text);}
+
+/* STUNTING CARD (NEW) */
+.stunt-card{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);margin-bottom:10px;border-left:4px solid #7B1FA2;}
+.stunt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.stunt-title{font-size:0.7rem;font-weight:800;color:#6A1B9A;text-transform:uppercase;letter-spacing:0.8px;}
+.stunt-badge{font-size:0.78rem;font-weight:800;padding:4px 12px;border-radius:20px;}
+.stunt-badge.sev{background:#FCE4EC;color:#880E4F;border:1.5px solid #F48FB1;}
+.stunt-badge.mod{background:#FFF3E0;color:#AD1457;border:1.5px solid #FFCC80;}
+.stunt-badge.ok{background:#E0F2F1;color:#00695C;border:1.5px solid #80CBC4;}
+.stunt-badge.na{background:#ECEFF1;color:#607D8B;border:1.5px solid #CFD8DC;}
+
+/* Height bar */
+.height-bar-wrap{margin-bottom:10px;}
+.height-bar-label{font-size:0.72rem;color:#607D8B;font-weight:600;margin-bottom:5px;}
+.height-bar{position:relative;height:12px;border-radius:6px;background:linear-gradient(to right,#880E4F 0%,#880E4F var(--h-sev),#AD1457 var(--h-sev),#AD1457 var(--h-mod),#00695C var(--h-mod),#00695C 100%);margin-bottom:6px;}
+.height-needle{position:absolute;top:-4px;width:4px;height:20px;background:#1A1A2E;border-radius:2px;transform:translateX(-50%);transition:left 0.5s ease;}
+.height-bar-labels{display:flex;justify-content:space-between;font-size:0.66rem;font-weight:700;color:#555;}
+.height-note{font-size:0.75rem;color:#555;line-height:1.55;margin-top:8px;padding:8px 10px;background:#F3E5F5;border-radius:8px;}
+
+/* Advice */
+.adv-card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:10px;}
+.adv-title{font-size:0.7rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:9px;}
+.adv-text{font-size:0.84rem;color:#333;line-height:1.65;font-weight:500;white-space:pre-line;}
+
+/* Legend */
+.legend{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:0 13px 13px;}
+.leg-title{font-size:0.7rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.leg-section{font-size:0.72rem;font-weight:800;color:#455A64;margin:10px 0 6px;text-transform:uppercase;letter-spacing:0.5px;}
+.leg-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.l-dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+.l-txt{font-size:0.79rem;line-height:1.5;color:#444;font-weight:500;}
+.l-txt strong{color:var(--text);font-weight:800;}
+.footer{text-align:center;padding:6px 16px 0;font-size:0.7rem;color:#BDBDBD;line-height:1.7;}
+
+#ib{display:none;background:#1B5E20;color:#fff;padding:10px 14px;text-align:center;font-size:0.78rem;font-weight:600;position:sticky;top:0;z-index:100;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;}
+#ib.show{display:flex;}
+#ib-btn{background:#fff;color:#1B5E20;border:none;border-radius:6px;padding:4px 12px;font-weight:800;font-size:0.75rem;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+
+<div id="ib">
+  📲 Home Screen par add karein — Offline kaam karega!
+  <button id="ib-btn">Install</button>
+  <span onclick="this.parentElement.classList.remove('show')" style="cursor:pointer;opacity:0.6;padding:0 4px">✕</span>
+</div>
+
+<div class="header">
+  <div class="h-icon">👶</div>
+  <h1>Poshan SAM MAM Calculator</h1>
+  <p>Wasting + Stunting Assessment</p>
+  <div class="badges">
+    <span class="badge">✓ OFFLINE</span>
+    <span class="badge">✓ Wasting (WHZ)</span>
+    <span class="badge">✓ Stunting (HAZ)</span>
+  </div>
+</div>
+
+<!-- CARD 1: Basic Info -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-icon si-green">👤</div>
+    <div><div class="sec-title">बच्चे की जानकारी</div><div class="sec-sub">Basic Information</div></div>
+  </div>
+
+  <div class="field">
+    <label>बच्चे का नाम <span class="hi">/ Child's Name</span></label>
+    <input class="inp" id="inp-name" type="text" placeholder="पूरा नाम लिखें" autocomplete="off">
+    <div class="err-msg" id="err-name">नाम लिखना जरूरी है</div>
+  </div>
+
+  <div class="field">
+    <label>जन्म तिथि <span class="hi">/ Date of Birth</span></label>
+    <input class="inp" id="inp-dob" type="date" onchange="onDobChange()">
+    <div class="err-msg" id="err-dob">जन्म तिथि डालना जरूरी है</div>
+
+    <!-- Age display -->
+    <div class="age-box" id="age-box">
+      <span style="font-size:22px;">🎂</span>
+      <div style="flex:1;">
+        <div class="age-val" id="age-val">—</div>
+        <div class="age-sub" id="age-sub">उम्र / Age</div>
+      </div>
+      <div class="age-table-badge" id="age-table-badge">—</div>
+    </div>
+    <div class="age-warn" id="age-warn"></div>
+
+    <!-- Age-based Range Box (NEW) -->
+    <div class="range-box" id="range-box">
+      <div class="range-header">📏 इस उम्र में सामान्य माप / Expected Range at this Age</div>
+      <div class="range-grid">
+        <div class="range-cell">
+          <div class="range-cell-label">सामान्य ऊँचाई</div>
+          <div class="range-cell-val green" id="range-height-normal">—</div>
+        </div>
+        <div class="range-cell">
+          <div class="range-cell-label">Stunting cutoff</div>
+          <div class="range-cell-val red" id="range-height-stunt">—</div>
+        </div>
+        <div class="range-cell">
+          <div class="range-cell-label">सामान्य वज़न</div>
+          <div class="range-cell-val green" id="range-weight-normal">—</div>
+        </div>
+        <div class="range-cell">
+          <div class="range-cell-label">SAM/MAM cutoff</div>
+          <div class="range-cell-val red" id="range-weight-cut">—</div>
+        </div>
+      </div>
+      <div class="range-status-row" id="range-status-row">
+        <!-- chips populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>लिंग <span class="hi">/ Gender</span></label>
+    <div class="g-row">
+      <button class="g-btn boy" id="btn-boy" onclick="selG('boy')">👦 लड़का / Boy</button>
+      <button class="g-btn girl" id="btn-girl" onclick="selG('girl')">👧 लड़की / Girl</button>
+    </div>
+    <div class="err-msg" id="err-gender">लिंग चुनना जरूरी है</div>
+  </div>
+</div>
+
+<!-- CARD 2: Measurements -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-icon si-blue">📐</div>
+    <div><div class="sec-title">शारीरिक माप</div><div class="sec-sub">Measurements</div></div>
+  </div>
+
+  <div class="field">
+    <label>ऊँचाई / लम्बाई <span class="hi">/ Height or Length (45–120 cm)</span></label>
+    <div class="unit-wrap">
+      <input class="inp" id="inp-height" type="number" placeholder="जैसे: 75.5" min="45" max="120" step="0.1" oninput="onMeasureInput()">
+      <div class="unit-tag">cm</div>
+    </div>
+    <div class="err-msg" id="err-height">45 से 120 cm के बीच होनी चाहिए</div>
+    <div style="font-size:0.7rem;color:#90A4AE;margin-top:4px;font-weight:500;">
+      💡 2 साल से कम: लेटाकर लम्बाई | 2 साल से ज़्यादा: खड़े होकर ऊँचाई
+    </div>
+  </div>
+
+  <div class="field">
+    <label>वज़न <span class="hi">/ Weight</span></label>
+    <div class="unit-wrap">
+      <input class="inp" id="inp-weight" type="number" placeholder="जैसे: 8.2" min="0.5" max="60" step="0.1" oninput="onMeasureInput()">
+      <div class="unit-tag">kg</div>
+    </div>
+    <div class="err-msg" id="err-weight">वज़न सही दर्ज करें</div>
+  </div>
+</div>
+
+<!-- CARD 3: Oedema -->
+<div class="card">
+  <div class="sec-head">
+    <div class="sec-icon si-purple">🔍</div>
+    <div><div class="sec-title">Bilateral Pitting Oedema</div><div class="sec-sub">दोनों पैरों में सूजन</div></div>
+  </div>
+  <div class="field" style="margin-bottom:0;">
+    <label>Oedema hai? <span class="hi">/ Present?</span></label>
+    <div class="oe-row">
+      <button class="oe-btn yes" id="btn-oe-y" onclick="selOe(true)">⚠️ हाँ / Yes</button>
+      <button class="oe-btn no" id="btn-oe-n" onclick="selOe(false)">✓ नहीं / No</button>
+    </div>
+    <div class="err-msg" id="err-oedema">Oedema की जानकारी दें</div>
+    <div class="oe-tip">
+      <strong>जाँच:</strong> दोनों पैरों के ऊपर 3 सेकंड दबाएँ — गड्ढा बने तो Oedema ✓<br>
+      <strong>Oedema = सीधे SAM</strong>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATE -->
+<div class="card" style="padding-top:4px;padding-bottom:14px;">
+  <button class="btn-calc" onclick="calculate()">🔍 जाँचें / Calculate</button>
+  <button class="btn-reset" onclick="resetForm()">🔄 रीसेट / Reset</button>
+</div>
+
+<!-- RESULTS -->
+<div class="result-wrap" id="result-wrap">
+
+  <!-- Wasting Result Banner -->
+  <div class="res-banner" id="res-banner">
+    <div class="res-circle" id="res-icon"></div>
+    <div>
+      <div class="res-name" id="res-name"></div>
+      <div class="res-status" id="res-status"></div>
+    </div>
+  </div>
+
+  <!-- Wasting Bar -->
+  <div class="cutoff-bar">
+    <div class="cb-title">📊 Wasting — वज़न स्थिति</div>
+    <div class="cb-scale" id="cb-scale" style="--pct-sam:0%;--pct-mam:0%;--pct-norm:0%;">
+      <div class="cb-needle" id="cb-needle" style="left:50%"></div>
+    </div>
+    <div class="cb-labels">
+      <span style="color:var(--sam)">SAM</span>
+      <span style="color:var(--mam)">MAM</span>
+      <span style="color:var(--ok)">Normal</span>
+      <span style="color:var(--ow)">OW/Obese</span>
+    </div>
+    <div class="cb-weight" id="cb-weight"></div>
+  </div>
+
+  <!-- STUNTING CARD (NEW) -->
+  <div class="stunt-card" id="stunt-card">
+    <div class="stunt-header">
+      <div class="stunt-title">📏 Stunting — ऊँचाई स्थिति</div>
+      <div class="stunt-badge" id="stunt-badge">—</div>
+    </div>
+    <div class="height-bar-wrap">
+      <div class="height-bar-label">Age के हिसाब से ऊँचाई की स्थिति</div>
+      <div class="height-bar" id="height-bar" style="--h-sev:0%;--h-mod:0%;">
+        <div class="height-needle" id="height-needle" style="left:50%"></div>
+      </div>
+      <div class="height-bar-labels">
+        <span style="color:var(--stunt-sev)">Severe</span>
+        <span style="color:var(--stunt-mod)">Moderate</span>
+        <span style="color:var(--stunt-ok)">Normal</span>
+      </div>
+    </div>
+    <div class="height-note" id="height-note"></div>
+  </div>
+
+  <!-- Detail Table -->
+  <div class="detail-card">
+    <div class="dt-title">📋 विस्तृत जानकारी / Details</div>
+    <div class="dt-row"><span class="dt-label">Age</span><span class="dt-val" id="d-age">—</span></div>
+    <div class="dt-row"><span class="dt-label">Table</span><span class="dt-val" id="d-table">—</span></div>
+    <div class="dt-row"><span class="dt-label">Height</span><span class="dt-val" id="d-height">—</span></div>
+    <div class="dt-row"><span class="dt-label">Weight</span><span class="dt-val" id="d-weight">—</span></div>
+    <div class="dt-row"><span class="dt-label">SAM cutoff (≤)</span><span class="dt-val sam-c" id="d-sam-cut">—</span></div>
+    <div class="dt-row"><span class="dt-label">MAM cutoff (≤)</span><span class="dt-val mam-c" id="d-mam-cut">—</span></div>
+    <div class="dt-row"><span class="dt-label">Normal cutoff (≤)</span><span class="dt-val ok-c" id="d-norm-cut">—</span></div>
+    <div class="dt-row"><span class="dt-label">Expected Height range</span><span class="dt-val" id="d-exp-height">—</span></div>
+    <div class="dt-row"><span class="dt-label">Stunting cutoff (height)</span><span class="dt-val stunt-mod-c" id="d-stunt-cut">—</span></div>
+    <div class="dt-row"><span class="dt-label">Oedema</span><span class="dt-val" id="d-oedema">—</span></div>
+    <div class="dt-row"><span class="dt-label" style="font-weight:800;color:#333;">Wasting (WHZ)</span><span class="dt-val" id="d-wasting" style="font-size:1rem;">—</span></div>
+    <div class="dt-row" style="border-bottom:none;"><span class="dt-label" style="font-weight:800;color:#333;">Stunting (HAZ)</span><span class="dt-val" id="d-stunting" style="font-size:1rem;">—</span></div>
+  </div>
+
+  <!-- Advice -->
+  <div class="adv-card">
+    <div class="adv-title">📋 क्या करें / Action Required</div>
+    <div class="adv-text" id="adv-text"></div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-title">Classification Guide</div>
+
+  <div class="leg-section">⚖️ Wasting (वज़न — height के अनुसार)</div>
+  <div class="leg-row"><div class="l-dot" style="background:var(--sam)"></div><div class="l-txt"><strong>SAM 🔴</strong> — Weight ≤ SAM cutoff या Oedema — NRC रेफर</div></div>
+  <div class="leg-row"><div class="l-dot" style="background:var(--mam)"></div><div class="l-txt"><strong>MAM 🟡</strong> — Weight ≤ MAM cutoff — SNP में शामिल करें</div></div>
+  <div class="leg-row"><div class="l-dot" style="background:var(--ok)"></div><div class="l-txt"><strong>Normal 🟢</strong> — सामान्य वज़न — निगरानी जारी रखें</div></div>
+  <div class="leg-row"><div class="l-dot" style="background:var(--ow)"></div><div class="l-txt"><strong>Overweight/Obese 🟣</strong> — आहार सलाह लें</div></div>
+
+  <div class="leg-section">📏 Stunting (ऊँचाई — age के अनुसार)</div>
+  <div class="leg-row"><div class="l-dot" style="background:#880E4F"></div><div class="l-txt"><strong>Severe Stunting 🔴</strong> — Height बहुत कम — NRC रेफर</div></div>
+  <div class="leg-row"><div class="l-dot" style="background:#AD1457"></div><div class="l-txt"><strong>Moderate Stunting 🟡</strong> — Height कम — पोषण में सुधार</div></div>
+  <div class="leg-row"><div class="l-dot" style="background:#00695C"></div><div class="l-txt"><strong>Normal 🟢</strong> — ऊँचाई सामान्य</div></div>
+
+  <div style="margin-top:10px;padding-top:10px;border-top:1px solid #E0E0E0;font-size:0.74rem;color:#607D8B;font-weight:600;">
+    ⚠️ 2 alag tables: <strong style="color:#333;">0–2 yrs</strong> (letakar) aur <strong style="color:#333;">2–5 yrs</strong> (khade hokar) — DOB se automatic select.
+  </div>
+</div>
+
+<div class="footer">Wasting Assessment Standards • v5.0</div>
+
+<script>
+// ════════════════════════════════════════════════
+// WASTING TABLES (direct cutoff, from assessment chart)
+// [height, sam, mam, normal, overweight]
+// ════════════════════════════════════════════════
+const G02=[
+[45,1.902,2.066,2.967,3.275],[45.5,1.967,2.138,3.07,3.389],[46,2.033,2.209,3.172,3.502],[46.5,2.098,2.28,3.275,3.616],[47,2.164,2.351,3.378,3.73],[47.5,2.23,2.423,3.482,3.845],[48,2.297,2.497,3.588,3.962],[48.5,2.366,2.571,3.696,4.082],[49,2.437,2.649,3.808,4.205],[49.5,2.511,2.729,3.924,4.334],[50,2.588,2.813,4.045,4.467],[50.5,2.668,2.9,4.171,4.606],[51,2.75,2.99,4.301,4.751],[51.5,2.836,3.084,4.437,4.901],[52,2.925,3.18,4.577,5.056],[52.5,3.017,3.28,4.721,5.216],[53,3.112,3.383,4.87,5.38],[53.5,3.208,3.488,5.022,5.549],[54,3.307,3.596,5.178,5.721],[54.5,3.407,3.705,5.336,5.896],[55,3.508,3.815,5.496,6.073],[55.5,3.611,3.926,5.657,6.251],[56,3.713,4.038,5.818,6.43],[56.5,3.816,4.15,5.98,6.609],[57,3.919,4.262,6.143,6.789],[57.5,4.021,4.373,6.304,6.968],[58,4.124,4.485,6.466,7.146],[58.5,4.226,4.596,6.626,7.324],[59,4.327,4.706,6.786,7.5],[59.5,4.427,4.815,6.944,7.675],[60,4.527,4.923,7.099,7.847],[60.5,4.624,5.03,7.253,8.017],[61,4.721,5.135,7.405,8.185],[61.5,4.817,5.239,7.555,8.351],[62,4.912,5.342,7.703,8.514],[62.5,5.005,5.444,7.849,8.675],[63,5.098,5.544,7.993,8.834],[63.5,5.189,5.644,8.136,8.992],[64,5.28,5.742,8.277,9.148],[64.5,5.37,5.84,8.417,9.302],[65,5.459,5.937,8.555,9.454],[65.5,5.547,6.033,8.692,9.605],[66,5.635,6.128,8.827,9.753],[66.5,5.721,6.221,8.96,9.901],[67,5.807,6.314,9.092,10.046],[67.5,5.892,6.406,9.222,10.189],[68,5.975,6.497,9.351,10.33],[68.5,6.058,6.586,9.478,10.47],[69,6.14,6.675,9.603,10.608],[69.5,6.221,6.763,9.728,10.745],[70,6.302,6.85,9.851,10.88],[70.5,6.382,6.937,9.973,11.014],[71,6.461,7.023,10.094,11.147],[71.5,6.54,7.108,10.215,11.279],[72,6.619,7.193,10.334,11.41],[72.5,6.697,7.278,10.453,11.54],[73,6.774,7.361,10.571,11.669],[73.5,6.851,7.444,10.687,11.797],[74,6.927,7.526,10.801,11.922],[74.5,7.001,7.607,10.915,12.046],[75,7.075,7.687,11.026,12.168],[75.5,7.148,7.766,11.136,12.289],[76,7.221,7.844,11.246,12.408],[76.5,7.293,7.922,11.354,12.527],[77,7.365,7.999,11.463,12.646],[77.5,7.437,8.078,11.572,12.765],[78,7.511,8.157,11.682,12.886],[78.5,7.585,8.237,11.794,13.008],[79,7.66,8.319,11.907,13.132],[79.5,7.737,8.402,12.023,13.26],[80,7.816,8.487,12.142,13.389],[80.5,7.897,8.574,12.264,13.523],[81,7.979,8.663,12.388,13.659],[81.5,8.064,8.755,12.517,13.8],[82,8.15,8.848,12.647,13.943],[82.5,8.238,8.943,12.781,14.09],[83,8.328,9.04,12.918,14.24],[83.5,8.419,9.139,13.058,14.393],[84,8.512,9.24,13.2,14.549],[84.5,8.606,9.342,13.344,14.708],[85,8.702,9.445,13.491,14.869],[85.5,8.798,9.55,13.639,15.033],[86,8.895,9.655,13.789,15.197],[86.5,8.993,9.761,13.94,15.363],[87,9.091,9.867,14.091,15.531],[87.5,9.188,9.973,14.243,15.698],[88,9.286,10.079,14.395,15.865],[88.5,9.383,10.184,14.546,16.032],[89,9.479,10.289,14.697,16.2],[89.5,9.575,10.394,14.848,16.367],[90,9.671,10.498,14.999,16.533],[90.5,9.767,10.602,15.15,16.7],[91,9.862,10.706,15.3,16.866],[91.5,9.956,10.809,15.451,17.033],[92,10.051,10.912,15.601,17.2],[92.5,10.146,11.015,15.752,17.368],[93,10.24,11.118,15.903,17.535],[93.5,10.334,11.221,16.055,17.704],[94,10.428,11.324,16.207,17.873],[94.5,10.523,11.428,16.36,18.044],[95,10.618,11.532,16.513,18.215],[95.5,10.713,11.636,16.669,18.388],[96,10.809,11.74,16.825,18.562],[96.5,10.905,11.846,16.982,18.737],[97,11.001,11.952,17.14,18.915],[97.5,11.099,12.058,17.3,19.094],[98,11.197,12.166,17.463,19.275],[98.5,11.295,12.275,17.627,19.459],[99,11.396,12.385,17.793,19.646],[99.5,11.497,12.496,17.963,19.836],[100,11.6,12.61,18.135,20.028],[100.5,11.705,12.725,18.31,20.226],[101,11.811,12.842,18.488,20.426],[101.5,11.919,12.96,18.67,20.63],[102,12.028,13.081,18.855,20.838],[102.5,12.14,13.204,19.043,21.049],[103,12.253,13.329,19.235,21.265],[103.5,12.367,13.455,19.429,21.484],[104,12.484,13.584,19.628,21.708],[104.5,12.602,13.714,19.829,21.935],[105,12.722,13.847,20.034,22.166],[105.5,12.844,13.981,20.242,22.401],[106,12.967,14.117,20.454,22.641],[106.5,13.092,14.256,20.669,22.883],[107,13.22,14.397,20.888,23.131],[107.5,13.349,14.54,21.111,23.383],[108,13.48,14.685,21.338,23.64],[108.5,13.614,14.833,21.569,23.9],[109,13.749,14.983,21.803,24.166],[109.5,13.886,15.135,22.041,24.435],[110,14.025,15.289,22.283,24.708]
+];
+const G25=[
+[65,5.583,6.071,8.746,9.664],[65.5,5.67,6.165,8.881,9.813],[66,5.756,6.259,9.013,9.959],[66.5,5.841,6.351,9.144,10.103],[67,5.925,6.442,9.274,10.246],[67.5,6.009,6.533,9.402,10.386],[68,6.091,6.622,9.528,10.525],[68.5,6.173,6.71,9.653,10.663],[69,6.254,6.798,9.777,10.798],[69.5,6.334,6.885,9.9,10.933],[70,6.414,6.971,10.021,11.067],[70.5,6.493,7.057,10.142,11.199],[71,6.572,7.142,10.263,11.331],[71.5,6.65,7.227,10.382,11.462],[72,6.728,7.311,10.5,11.592],[72.5,6.805,7.395,10.617,11.72],[73,6.881,7.477,10.733,11.847],[73.5,6.957,7.559,10.847,11.972],[74,7.031,7.639,10.959,12.095],[74.5,7.104,7.718,11.07,12.217],[75,7.177,7.797,11.18,12.337],[75.5,7.249,7.875,11.289,12.456],[76,7.321,7.953,11.398,12.575],[76.5,7.394,8.031,11.506,12.694],[77,7.466,8.109,11.616,12.813],[77.5,7.54,8.189,11.727,12.935],[78,7.615,8.27,11.839,13.058],[78.5,7.691,8.352,11.954,13.183],[79,7.769,8.436,12.07,13.311],[79.5,7.848,8.522,12.19,13.442],[80,7.929,8.609,12.313,13.577],[80.5,8.013,8.7,12.439,13.715],[81,8.098,8.792,12.569,13.857],[81.5,8.185,8.886,12.701,14.001],[82,8.274,8.982,12.836,14.15],[82.5,8.364,9.08,12.974,14.301],[83,8.456,9.179,13.114,14.455],[83.5,8.55,9.281,13.257,14.613],[84,8.644,9.383,13.402,14.772],[84.5,8.74,9.487,13.55,14.934],[85,8.837,9.592,13.699,15.098],[85.5,8.934,9.697,13.849,15.264],[86,9.032,9.803,14.0,15.43],[86.5,9.13,9.91,14.152,15.597],[87,9.227,10.015,14.304,15.765],[87.5,9.324,10.121,14.455,15.932],[88,9.421,10.226,14.607,16.099],[88.5,9.518,10.331,14.758,16.266],[89,9.614,10.436,14.909,16.433],[89.5,9.709,10.54,15.059,16.6],[90,9.805,10.644,15.21,16.767],[90.5,9.9,10.747,15.36,16.933],[91,9.994,10.85,15.511,17.1],[91.5,10.089,10.953,15.662,17.267],[92,10.183,11.056,15.813,17.435],[92.5,10.277,11.159,15.964,17.603],[93,10.372,11.262,16.116,17.772],[93.5,10.466,11.366,16.268,17.942],[94,10.561,11.469,16.421,18.112],[94.5,10.656,11.573,16.576,18.284],[95,10.751,11.678,16.731,18.457],[95.5,10.847,11.783,16.887,18.632],[96,10.943,11.888,17.045,18.808],[96.5,11.04,11.994,17.204,18.986],[97,11.137,12.101,17.365,19.166],[97.5,11.236,12.209,17.528,19.349],[98,11.336,12.319,17.693,19.533],[98.5,11.436,12.429,17.861,19.721],[99,11.538,12.542,18.031,19.913],[99.5,11.642,12.655,18.205,20.107],[100,11.747,12.771,18.381,20.305],[100.5,11.854,12.889,18.561,20.507],[101,11.962,13.008,18.743,20.712],[101.5,12.072,13.13,18.93,20.922],[102,12.184,13.253,19.119,21.136],[102.5,12.298,13.379,19.312,21.352],[103,12.414,13.506,19.508,21.574],[103.5,12.531,13.636,19.708,21.799],[104,12.65,13.767,19.911,22.027],[104.5,12.77,13.9,20.117,22.26],[105,12.893,14.035,20.326,22.496],[105.5,13.017,14.173,20.54,22.737],[106,13.143,14.312,20.756,22.982],[106.5,13.271,14.454,20.977,23.231],[107,13.401,14.598,21.202,23.485],[107.5,13.533,14.744,21.43,23.743],[108,13.667,14.892,21.662,24.006],[108.5,13.803,15.043,21.898,24.273],[109,13.942,15.196,22.138,24.544],[109.5,14.081,15.351,22.38,24.819],[110,14.223,15.508,22.626,25.098],[111,14.511,15.827,23.128,25.666],[112,14.804,16.152,23.642,26.249],[113,15.103,16.484,24.165,26.843],[114,15.406,16.82,24.698,27.448],[115,15.712,17.16,25.238,28.061],[116,16.021,17.503,25.783,28.681],[117,16.329,17.846,26.332,29.307],[118,16.639,18.19,26.883,29.935],[119,16.948,18.534,27.437,30.567],[120,17.256,18.878,27.991,31.199]
+];
+const B02=[
+[45,1.877,2.043,2.951,3.261],[45.5,1.942,2.114,3.05,3.37],[46,2.008,2.185,3.149,3.477],[46.5,2.074,2.256,3.248,3.585],[47,2.141,2.328,3.347,3.694],[47.5,2.208,2.401,3.448,3.804],[48,2.277,2.476,3.551,3.916],[48.5,2.349,2.552,3.657,4.031],[49,2.422,2.632,3.766,4.151],[49.5,2.499,2.715,3.881,4.275],[50,2.579,2.801,3.999,4.403],[50.5,2.661,2.889,4.12,4.536],[51,2.746,2.981,4.245,4.672],[51.5,2.834,3.075,4.375,4.813],[52,2.925,3.173,4.509,4.958],[52.5,3.02,3.276,4.649,5.111],[53,3.12,3.383,4.795,5.27],[53.5,3.223,3.494,4.947,5.434],[54,3.33,3.609,5.104,5.605],[54.5,3.44,3.727,5.264,5.779],[55,3.553,3.848,5.428,5.957],[55.5,3.667,3.971,5.595,6.138],[56,3.783,4.095,5.764,6.322],[56.5,3.9,4.221,5.935,6.506],[57,4.017,4.347,6.106,6.692],[57.5,4.135,4.474,6.276,6.877],[58,4.252,4.599,6.447,7.061],[58.5,4.369,4.725,6.616,7.245],[59,4.485,4.849,6.784,7.427],[59.5,4.6,4.973,6.951,7.607],[60,4.713,5.094,7.115,7.785],[60.5,4.824,5.213,7.275,7.959],[61,4.932,5.329,7.433,8.13],[61.5,5.039,5.443,7.587,8.297],[62,5.143,5.555,7.739,8.462],[62.5,5.245,5.665,7.888,8.624],[63,5.346,5.774,8.035,8.784],[63.5,5.445,5.88,8.181,8.942],[64,5.544,5.986,8.325,9.098],[64.5,5.64,6.09,8.467,9.253],[65,5.736,6.193,8.608,9.406],[65.5,5.83,6.295,8.748,9.558],[66,5.924,6.396,8.887,9.71],[66.5,6.017,6.496,9.026,9.861],[67,6.109,6.595,9.163,10.011],[67.5,6.2,6.694,9.3,10.161],[68,6.291,6.791,9.436,10.31],[68.5,6.38,6.888,9.572,10.459],[69,6.47,6.985,9.708,10.607],[69.5,6.559,7.081,9.843,10.756],[70,6.647,7.177,9.979,10.905],[70.5,6.735,7.273,10.114,11.053],[71,6.823,7.368,10.248,11.201],[71.5,6.909,7.462,10.382,11.348],[72,6.995,7.555,10.514,11.493],[72.5,7.08,7.647,10.645,11.637],[73,7.163,7.737,10.774,11.78],[73.5,7.246,7.827,10.902,11.92],[74,7.327,7.915,11.028,12.059],[74.5,7.407,8.002,11.152,12.195],[75,7.486,8.088,11.275,12.33],[75.5,7.565,8.173,11.396,12.464],[76,7.641,8.257,11.515,12.595],[76.5,7.717,8.339,11.632,12.723],[77,7.792,8.42,11.746,12.848],[77.5,7.865,8.499,11.858,12.972],[78,7.938,8.578,11.968,13.092],[78.5,8.01,8.655,12.077,13.211],[79,8.082,8.733,12.184,13.328],[79.5,8.154,8.811,12.291,13.445],[80,8.227,8.89,12.399,13.561],[80.5,8.302,8.97,12.507,13.679],[81,8.379,9.052,12.617,13.798],[81.5,8.457,9.136,12.73,13.92],[82,8.538,9.223,12.845,14.044],[82.5,8.623,9.313,12.964,14.172],[83,8.71,9.406,13.086,14.303],[83.5,8.8,9.503,13.213,14.439],[84,8.894,9.602,13.342,14.578],[84.5,8.99,9.705,13.476,14.721],[85,9.088,9.809,13.612,14.866],[85.5,9.189,9.916,13.75,15.014],[86,9.29,10.024,13.89,15.163],[86.5,9.392,10.133,14.03,15.314],[87,9.495,10.242,14.172,15.465],[87.5,9.597,10.35,14.313,15.617],[88,9.698,10.458,14.454,15.768],[88.5,9.798,10.565,14.594,15.919],[89,9.897,10.671,14.734,16.069],[89.5,9.995,10.775,14.873,16.219],[90,10.092,10.879,15.011,16.368],[90.5,10.188,10.981,15.149,16.517],[91,10.282,11.083,15.286,16.666],[91.5,10.376,11.184,15.423,16.815],[92,10.469,11.284,15.561,16.964],[92.5,10.562,11.384,15.698,17.114],[93,10.654,11.483,15.836,17.264],[93.5,10.745,11.582,15.974,17.416],[94,10.837,11.681,16.114,17.569],[94.5,10.928,11.78,16.254,17.723],[95,11.02,11.88,16.396,17.88],[95.5,11.111,11.98,16.54,18.038],[96,11.204,12.08,16.686,18.2],[96.5,11.297,12.182,16.834,18.364],[97,11.39,12.284,16.985,18.532],[97.5,11.485,12.388,17.139,18.702],[98,11.582,12.494,17.296,18.877],[98.5,11.679,12.6,17.455,19.055],[99,11.777,12.709,17.618,19.237],[99.5,11.877,12.818,17.784,19.423],[100,11.978,12.929,17.954,19.612],[100.5,12.079,13.042,18.126,19.805],[101,12.182,13.155,18.3,20.002],[101.5,12.286,13.27,18.478,20.201],[102,12.391,13.386,18.658,20.404],[102.5,12.497,13.504,18.841,20.61],[103,12.604,13.623,19.027,20.819],[103.5,12.712,13.742,19.215,21.032],[104,12.821,13.863,19.405,21.247],[104.5,12.93,13.985,19.598,21.465],[105,13.041,14.109,19.793,21.686],[105.5,13.153,14.233,19.99,21.909],[106,13.266,14.359,20.19,22.136],[106.5,13.38,14.486,20.393,22.365],[107,13.496,14.615,20.598,22.598],[107.5,13.611,14.744,20.806,22.835],[108,13.729,14.875,21.016,23.073],[108.5,13.847,15.008,21.229,23.316],[109,13.967,15.142,21.446,23.562],[109.5,14.088,15.277,21.665,23.812],[110,14.211,15.414,21.888,24.066]
+];
+const B25=[
+[65,5.868,6.335,8.804,9.619],[65.5,5.961,6.436,8.943,9.771],[66,6.054,6.536,9.081,9.921],[66.5,6.146,6.635,9.218,10.071],[67,6.236,6.733,9.355,10.221],[67.5,6.327,6.83,9.491,10.369],[68,6.416,6.927,9.626,10.518],[68.5,6.505,7.024,9.762,10.667],[69,6.594,7.12,9.898,10.816],[69.5,6.683,7.216,10.033,10.964],[70,6.771,7.311,10.168,11.112],[70.5,6.858,7.406,10.302,11.259],[71,6.944,7.499,10.435,11.406],[71.5,7.029,7.592,10.567,11.551],[72,7.113,7.683,10.697,11.694],[72.5,7.196,7.773,10.826,11.836],[73,7.278,7.862,10.952,11.975],[73.5,7.359,7.95,11.078,12.113],[74,7.439,8.036,11.201,12.25],[74.5,7.518,8.122,11.324,12.384],[75,7.596,8.207,11.444,12.516],[75.5,7.672,8.29,11.562,12.646],[76,7.747,8.371,11.678,12.773],[76.5,7.821,8.452,11.791,12.898],[77,7.895,8.531,11.902,13.02],[77.5,7.967,8.609,12.012,13.14],[78,8.039,8.686,12.12,13.258],[78.5,8.111,8.764,12.227,13.375],[79,8.183,8.842,12.334,13.491],[79.5,8.257,8.922,12.442,13.608],[80,8.332,9.002,12.551,13.726],[80.5,8.41,9.085,12.662,13.847],[81,8.489,9.171,12.776,13.969],[81.5,8.572,9.258,12.892,14.095],[82,8.657,9.35,13.013,14.224],[82.5,8.746,9.444,13.137,14.357],[83,8.837,9.542,13.264,14.494],[83.5,8.932,9.643,13.396,14.635],[84,9.029,9.746,13.53,14.778],[84.5,9.128,9.852,13.667,14.925],[85,9.229,9.959,13.806,15.074],[85.5,9.331,10.067,13.946,15.224],[86,9.433,10.176,14.087,15.374],[86.5,9.536,10.285,14.228,15.526],[87,9.637,10.393,14.37,15.677],[87.5,9.738,10.501,14.51,15.828],[88,9.838,10.607,14.65,15.979],[88.5,9.937,10.713,14.79,16.129],[89,10.034,10.817,14.928,16.278],[89.5,10.13,10.92,15.066,16.428],[90,10.226,11.022,15.204,16.576],[90.5,10.32,11.123,15.341,16.725],[91,10.414,11.224,15.478,16.874],[91.5,10.507,11.324,15.615,17.024],[92,10.599,11.424,15.753,17.174],[92.5,10.691,11.523,15.891,17.325],[93,10.782,11.622,16.03,17.477],[93.5,10.873,11.721,16.17,17.63],[94,10.964,11.82,16.311,17.786],[94.5,11.056,11.919,16.454,17.943],[95,11.148,12.02,16.598,18.103],[95.5,11.241,12.121,16.745,18.265],[96,11.334,12.223,16.894,18.43],[96.5,11.428,12.326,17.046,18.599],[97,11.524,12.43,17.201,18.771],[97.5,11.62,12.536,17.359,18.948],[98,11.718,12.644,17.52,19.127],[98.5,11.817,12.752,17.684,19.311],[99,11.917,12.863,17.852,19.498],[99.5,12.018,12.974,18.022,19.688],[100,12.12,13.087,18.195,19.883],[100.5,12.224,13.201,18.371,20.081],[101,12.328,13.317,18.55,20.282],[101.5,12.433,13.433,18.731,20.487],[102,12.539,13.551,18.915,20.694],[102.5,12.647,13.67,19.102,20.904],[103,12.755,13.791,19.291,21.118],[103.5,12.865,13.912,19.482,21.334],[104,12.975,14.035,19.675,21.553],[104.5,13.086,14.159,19.871,21.775],[105,13.198,14.283,20.07,22.0],[105.5,13.312,14.41,20.271,22.227],[106,13.426,14.537,20.475,22.458],[106.5,13.542,14.667,20.68,22.692],[107,13.658,14.797,20.89,22.93],[107.5,13.776,14.928,21.101,23.17],[108,13.895,15.061,21.316,23.415],[108.5,14.015,15.195,21.533,23.662],[109,14.137,15.332,21.754,23.913],[109.5,14.26,15.47,21.978,24.169],[110,14.385,15.609,22.205,24.428],[111,14.639,15.894,22.668,24.955],[112,14.898,16.184,23.141,25.496],[113,15.162,16.479,23.623,26.047],[114,15.429,16.779,24.114,26.607],[115,15.7,17.083,24.612,27.176],[116,15.974,17.389,25.115,27.752],[117,16.248,17.697,25.623,28.334],[118,16.523,18.006,26.135,28.921],[119,16.798,18.316,26.65,29.512],[120,17.072,18.624,27.167,30.107]
+];
+
+// ════════════════════════════════════════════════
+// STUNTING TABLE — Height-for-Age
+// [age_months, severe_cutoff_cm, moderate_cutoff_cm, median_cm, plus2_cm]
+// severe  = -3SD height (below = Severe Stunting)
+// moderate= -2SD height (below = Moderate Stunting)
+// ════════════════════════════════════════════════
+const HAZ_BOYS=[
+// [age, -3SD, -2SD, median, +2SD]
+[0,44.2,46.1,49.9,53.7],[1,48.9,50.8,54.7,58.6],[2,52.4,54.4,58.4,62.4],[3,55.3,57.3,61.4,65.5],[4,57.6,59.7,63.9,68.0],[5,59.6,61.7,65.9,70.1],[6,61.2,63.3,67.6,71.9],[7,62.7,64.8,69.2,73.5],[8,64.0,66.2,70.6,75.0],[9,65.2,67.5,72.0,76.5],[10,66.4,68.7,73.3,77.9],[11,67.6,69.9,74.5,79.2],[12,68.6,71.0,75.7,80.5],[13,69.6,72.1,76.9,81.8],[14,70.6,73.1,78.0,83.0],[15,71.6,74.1,79.1,84.2],[16,72.5,75.0,80.2,85.4],[17,73.3,76.0,81.2,86.5],[18,74.2,76.9,82.3,87.7],[19,75.0,77.7,83.2,88.7],[20,75.8,78.6,84.2,89.8],[21,76.5,79.4,85.1,90.8],[22,77.2,80.2,86.0,91.8],[23,78.0,81.0,86.9,92.9],[24,78.0,81.0,87.8,94.6],[25,78.6,81.7,88.6,95.4],[26,79.3,82.5,89.4,96.3],[27,79.9,83.1,90.3,97.4],[28,80.5,83.8,91.1,98.4],[29,81.1,84.5,91.9,99.3],[30,81.7,85.1,92.7,100.3],[31,82.3,85.7,93.5,101.3],[32,82.8,86.4,94.2,102.1],[33,83.4,87.0,95.0,103.0],[34,83.9,87.5,95.7,103.9],[35,84.4,88.1,96.5,104.8],[36,85.0,88.7,97.1,105.6],[37,85.5,89.2,97.7,106.2],[38,86.0,89.8,98.4,107.0],[39,86.5,90.3,99.1,107.9],[40,87.0,90.9,99.7,108.6],[41,87.5,91.4,100.3,109.3],[42,88.0,91.9,100.9,110.0],[43,88.4,92.4,101.5,110.6],[44,88.9,92.9,102.2,111.5],[45,89.3,93.4,102.7,112.1],[46,89.8,93.8,103.3,112.8],[47,90.2,94.3,103.9,113.5],[48,90.7,94.8,104.6,114.4],[49,91.1,95.2,105.1,115.0],[50,91.5,95.7,105.7,115.7],[51,91.9,96.1,106.2,116.2],[52,92.3,96.5,106.8,117.0],[53,92.7,97.0,107.3,117.6],[54,93.1,97.4,107.9,118.4],[55,93.5,97.8,108.4,118.9],[56,93.9,98.3,109.0,119.7],[57,94.2,98.6,109.4,120.2],[58,94.6,99.0,110.0,121.0],[59,95.0,99.5,110.4,121.4],[60,95.2,99.9,111.0,122.0]
+];
+const HAZ_GIRLS=[
+[0,43.6,45.4,49.1,52.9],[1,47.8,49.8,53.7,57.6],[2,51.0,53.0,57.1,61.1],[3,53.5,55.6,59.8,64.0],[4,55.6,57.8,62.1,66.4],[5,57.4,59.6,64.0,68.5],[6,58.9,61.2,65.7,70.3],[7,60.3,62.7,67.3,71.9],[8,61.7,64.0,68.7,73.5],[9,62.9,65.3,70.1,74.9],[10,64.1,66.5,71.5,76.4],[11,65.2,67.7,72.8,77.8],[12,66.3,68.9,74.0,79.2],[13,67.3,70.0,75.2,80.5],[14,68.3,71.0,76.4,81.7],[15,69.3,72.0,77.5,83.0],[16,70.2,73.0,78.6,84.2],[17,71.1,73.9,79.7,85.4],[18,72.0,74.9,80.7,86.5],[19,72.8,75.8,81.7,87.6],[20,73.7,76.7,82.7,88.7],[21,74.5,77.5,83.7,89.8],[22,75.3,78.4,84.6,90.8],[23,76.1,79.2,85.5,91.9],[24,76.0,79.3,86.4,93.5],[25,76.8,80.2,87.3,94.5],[26,77.5,81.0,88.2,95.4],[27,78.2,81.8,89.0,96.2],[28,78.9,82.5,89.9,97.2],[29,79.6,83.2,90.7,98.1],[30,80.3,83.9,91.4,98.9],[31,80.9,84.6,92.2,99.8],[32,81.5,85.3,93.0,100.7],[33,82.2,86.0,93.7,101.5],[34,82.8,86.6,94.5,102.4],[35,83.3,87.2,95.2,103.2],[36,83.9,87.8,95.9,104.0],[37,84.4,88.4,96.5,104.7],[38,85.0,89.0,97.2,105.5],[39,85.5,89.6,97.9,106.2],[40,86.0,90.1,98.6,107.1],[41,86.5,90.7,99.2,107.8],[42,87.0,91.2,99.9,108.5],[43,87.5,91.8,100.5,109.3],[44,88.0,92.3,101.2,110.1],[45,88.4,92.8,101.8,110.7],[46,88.9,93.4,102.4,111.5],[47,89.3,93.9,103.0,112.1],[48,89.8,94.4,103.7,112.9],[49,90.2,94.9,104.2,113.5],[50,90.7,95.4,104.9,114.3],[51,91.1,95.9,105.5,115.1],[52,91.5,96.4,106.0,115.6],[53,91.9,96.9,106.7,116.4],[54,92.3,97.4,107.2,117.1],[55,92.7,97.8,107.8,117.7],[56,93.1,98.3,108.4,118.5],[57,93.5,98.7,108.9,119.1],[58,93.9,99.2,109.5,119.8],[59,94.2,99.7,110.0,120.4],[60,94.6,100.1,110.5,121.0]
+];
+
+// ════════════════════════════════════════════════
+// HAZ per-month normal height ranges (for DOB display)
+// [age_months, normal_low (−2SD), normal_high (+2SD), median]
+// ════════════════════════════════════════════════
+
+// ── Lookup helpers ────────────────────────────────────────────
+function interpTable(table, key) {
+  const k = Math.round(key * 10) / 10;
+  for (let i = 0; i < table.length; i++) {
+    if (Math.abs(table[i][0] - k) < 0.001) return table[i];
+  }
+  let lo = null, hi = null;
+  for (let i = 0; i < table.length - 1; i++) {
+    if (table[i][0] <= k && table[i+1][0] >= k) { lo = i; hi = i+1; break; }
+  }
+  if (lo === null) return table[0];
+  if (hi === null) return table[table.length - 1];
+  const f = (k - table[lo][0]) / (table[hi][0] - table[lo][0]);
+  return table[lo].map((v, idx) => idx === 0 ? k : v + f * (table[hi][idx] - v));
+}
+
+function interpHAZ(isBoy, ageMos) {
+  const t = isBoy ? HAZ_BOYS : HAZ_GIRLS;
+  const am = Math.min(Math.max(Math.round(ageMos), 0), 60);
+  return interpTable(t, am);
+}
+
+function getWastingTable(isBoy, ageMos) {
+  if (isBoy) return ageMos < 24 ? B02 : B25;
+  return ageMos < 24 ? G02 : G25;
+}
+
+// ── State ─────────────────────────────────────────────────────
+let gdr = null, oe = null, ageMonths = null;
+
+function onDobChange() {
+  const dob = document.getElementById('inp-dob').value;
+  if (!dob) { hideAgeBox(); return; }
+  const dobDate = new Date(dob);
+  const today   = new Date();
+  if (dobDate > today) {
+    hideAgeBox();
+    showWarn('⚠️ जन्म तिथि भविष्य की नहीं हो सकती');
+    return;
+  }
+  let yrs = today.getFullYear() - dobDate.getFullYear();
+  let mos = today.getMonth()    - dobDate.getMonth();
+  let days= today.getDate()     - dobDate.getDate();
+  if (days < 0) mos--;
+  if (mos < 0) { mos += 12; yrs--; }
+  ageMonths = yrs * 12 + mos;
+
+  const yShow = Math.floor(ageMonths / 12), mShow = ageMonths % 12;
+  document.getElementById('age-val').textContent  = (yShow > 0 ? yShow + ' साल ' : '') + mShow + ' महीने';
+  document.getElementById('age-sub').textContent  = 'उम्र = ' + ageMonths + ' months';
+  document.getElementById('age-table-badge').textContent = ageMonths < 24 ? '0-2 yrs' : '2-5 yrs';
+  document.getElementById('age-box').classList.add('show');
+
+  let warn = '';
+  if (ageMonths > 60) warn = '⚠️ Table sirf 5 saal (60 months) tak hai. Height ke basis par calculate hoga.';
+  showWarn(warn);
+
+  // Update range box
+  updateRangeBox();
+  // Re-update if measure inputs already filled
+  onMeasureInput();
+}
+
+function hideAgeBox() {
+  document.getElementById('age-box').classList.remove('show');
+  document.getElementById('range-box').classList.remove('show');
+  ageMonths = null;
+}
+function showWarn(msg) {
+  const el = document.getElementById('age-warn');
+  el.textContent = msg;
+  el.classList.toggle('show', msg !== '');
+}
+
+function updateRangeBox() {
+  if (ageMonths === null) return;
+  const am = Math.min(ageMonths, 60);
+  // We need gender for wasting cutoff — show based on current gender selection
+  // Height range from HAZ (gender-specific if selected, else show both)
+  const isBoy = gdr === 'boy';
+  const hazRow = interpHAZ(isBoy || gdr === null, am);
+  // hazRow: [age, -3SD, -2SD, median, +2SD]
+  const hMed  = hazRow[3].toFixed(1);
+  const hNorm = hazRow[2].toFixed(1) + ' – ' + hazRow[4].toFixed(1) + ' cm';
+  const hStunt= hazRow[2].toFixed(1) + ' cm (Moderate) / ' + hazRow[1].toFixed(1) + ' cm (Severe)';
+
+  document.getElementById('range-height-normal').textContent = hNorm;
+  document.getElementById('range-height-stunt').textContent  = '< ' + hazRow[1].toFixed(1) + ' cm (Severe), < ' + hazRow[2].toFixed(1) + ' cm (Moderate)';
+  document.getElementById('range-box').classList.add('show');
+
+  // Weight range from wasting table at median height for this age
+  const wTable = getWastingTable(isBoy || true, ageMonths); // use boy as default if not selected
+  const wRow   = interpTable(wTable, hazRow[3]);
+  if (wRow) {
+    document.getElementById('range-weight-normal').textContent = wRow[3].toFixed(2) + ' – ' + wRow[4].toFixed(2) + ' kg';
+    document.getElementById('range-weight-cut').textContent    = 'SAM ≤ ' + wRow[1].toFixed(2) + ' kg, MAM ≤ ' + wRow[2].toFixed(2) + ' kg';
+  }
+
+  // Status chips — updated when measures are entered
+  updateRangeChips();
+}
+
+function onMeasureInput() {
+  updateRangeChips();
+}
+
+function updateRangeChips() {
+  const height  = parseFloat(document.getElementById('inp-height').value);
+  const weight  = parseFloat(document.getElementById('inp-weight').value);
+  const chipDiv = document.getElementById('range-status-row');
+
+  if (ageMonths === null || isNaN(height) || isNaN(weight)) {
+    chipDiv.innerHTML = '<span style="font-size:0.75rem;color:#90A4AE;">Height aur Weight darj karne par yahan status dikhega</span>';
+    return;
+  }
+
+  const isBoy  = gdr !== 'girl';
+  const am     = Math.min(ageMonths, 60);
+  const hazRow = interpHAZ(isBoy, am);
+
+  // Height status
+  let hChip, hStatus;
+  if (height < hazRow[1]) { hChip = 'chip-bad'; hStatus = '📏 Severe Stunting'; }
+  else if (height < hazRow[2]) { hChip = 'chip-warn'; hStatus = '📏 Moderate Stunting'; }
+  else { hChip = 'chip-ok'; hStatus = '📏 Normal Height'; }
+
+  // Weight/wasting status (quick preview)
+  const wTable = getWastingTable(isBoy, ageMonths);
+  const wRow   = interpTable(wTable, height);
+  let wChip, wStatus;
+  if (weight <= wRow[1]) { wChip = 'chip-bad'; wStatus = '⚖️ SAM (वज़न)'; }
+  else if (weight <= wRow[2]) { wChip = 'chip-warn'; wStatus = '⚖️ MAM (वज़न)'; }
+  else if (weight <= wRow[3]) { wChip = 'chip-ok'; wStatus = '⚖️ Normal (वज़न)'; }
+  else { wChip = 'chip-ow'; wStatus = '⚖️ Overweight'; }
+
+  chipDiv.innerHTML =
+    `<span class="range-chip ${hChip}">${hStatus}</span>` +
+    `<span class="range-chip ${wChip}">${wStatus}</span>`;
+}
+
+function selG(g) {
+  gdr = g;
+  document.getElementById('btn-boy').classList.toggle('sel', g === 'boy');
+  document.getElementById('btn-girl').classList.toggle('sel', g === 'girl');
+  document.getElementById('err-gender').classList.remove('show');
+  updateRangeBox();
+  onMeasureInput();
+}
+function selOe(v) {
+  oe = v;
+  document.getElementById('btn-oe-y').classList.toggle('sel', v === true);
+  document.getElementById('btn-oe-n').classList.toggle('sel', v === false);
+  document.getElementById('err-oedema').classList.remove('show');
+}
+function setErr(id, show) {
+  document.getElementById(id).classList.toggle('show', show);
+  const inp = document.getElementById(id.replace('err-', 'inp-'));
+  if (inp) inp.classList.toggle('err', show);
+}
+
+// ── CALCULATE ────────────────────────────────────────────────
+function calculate() {
+  const name   = document.getElementById('inp-name').value.trim();
+  const dob    = document.getElementById('inp-dob').value;
+  const height = parseFloat(document.getElementById('inp-height').value);
+  const weight = parseFloat(document.getElementById('inp-weight').value);
+
+  let ok = true;
+  setErr('err-name',   !name);                                     if (!name) ok = false;
+  setErr('err-dob',    !dob || ageMonths === null);                if (!dob || ageMonths === null) ok = false;
+  setErr('err-gender', !gdr);                                      if (!gdr) ok = false;
+  setErr('err-height', isNaN(height)||height<45||height>120);      if (isNaN(height)||height<45||height>120) ok = false;
+  setErr('err-weight', isNaN(weight)||weight<0.5||weight>60);      if (isNaN(weight)||weight<0.5||weight>60) ok = false;
+  setErr('err-oedema', oe === null);                               if (oe === null) ok = false;
+  if (!ok) return;
+
+  const isBoy = gdr === 'boy';
+  const gLabel = isBoy ? 'लड़का / Boy' : 'लड़की / Girl';
+  const yrs = Math.floor(ageMonths / 12), mos = ageMonths % 12;
+  const ageStr = (yrs > 0 ? yrs + ' yr ' : '') + mos + ' mo (' + ageMonths + ' months)';
+  const tblName = (isBoy ? 'Boy' : 'Girl') + (ageMonths < 24 ? ' 0-2 yrs' : ' 2-5 yrs');
+
+  // ── WASTING ───────────────────────────────────────────────
+  const wTable = getWastingTable(isBoy, ageMonths);
+  const wRow   = interpTable(wTable, height);
+  const [, samCut, mamCut, normCut, owCut] = wRow;
+
+  let wResult, wCls, wIcon;
+  if (oe) {
+    wResult = 'SAM'; wCls = 'sam'; wIcon = '🔴';
+  } else if (weight <= samCut) {
+    wResult = 'SAM'; wCls = 'sam'; wIcon = '🔴';
+  } else if (weight <= mamCut) {
+    wResult = 'MAM'; wCls = 'mam'; wIcon = '🟡';
+  } else if (weight <= normCut) {
+    wResult = 'Normal'; wCls = 'norm'; wIcon = '🟢';
+  } else if (weight <= owCut) {
+    wResult = 'Overweight'; wCls = 'ow'; wIcon = '🟣';
+  } else {
+    wResult = 'Obese'; wCls = 'ow'; wIcon = '🔵';
+  }
+
+  // ── STUNTING ─────────────────────────────────────────────
+  const am = Math.min(ageMonths, 60);
+  const hRow = interpHAZ(isBoy, am);
+  // hRow: [age, -3SD, -2SD, median, +2SD]
+  const sevH = hRow[1], modH = hRow[2], medH = hRow[3], p2H = hRow[4];
+
+  let sResult, sBadgeCls, sIcon;
+  if (height < sevH) {
+    sResult = 'Severe Stunting'; sBadgeCls = 'sev'; sIcon = '🔴';
+  } else if (height < modH) {
+    sResult = 'Moderate Stunting'; sBadgeCls = 'mod'; sIcon = '🟡';
+  } else {
+    sResult = 'Normal'; sBadgeCls = 'ok'; sIcon = '🟢';
+  }
+
+  // ── UPDATE UI ─────────────────────────────────────────────
+  // Banner (wasting is primary)
+  const banner = document.getElementById('res-banner');
+  banner.className = 'res-banner ' + wCls;
+  document.getElementById('res-icon').textContent   = wIcon;
+  document.getElementById('res-name').textContent   = name + ' (' + gLabel + ')';
+  document.getElementById('res-status').textContent = wResult;
+
+  // Wasting bar
+  const maxS = owCut * 1.15;
+  document.getElementById('cb-scale').style.setProperty('--pct-sam',  (samCut/maxS*100).toFixed(1)+'%');
+  document.getElementById('cb-scale').style.setProperty('--pct-mam',  (mamCut/maxS*100).toFixed(1)+'%');
+  document.getElementById('cb-scale').style.setProperty('--pct-norm', (normCut/maxS*100).toFixed(1)+'%');
+  document.getElementById('cb-needle').style.left = Math.min(weight/maxS*100,97).toFixed(1)+'%';
+  document.getElementById('cb-weight').textContent = weight+' kg → '+wResult;
+
+  // Stunting card
+  document.getElementById('stunt-badge').textContent = sIcon + ' ' + sResult;
+  document.getElementById('stunt-badge').className   = 'stunt-badge ' + sBadgeCls;
+
+  // Height bar — range: sevH to p2H+2
+  const hMin  = sevH - 2, hMax = p2H + 2;
+  const hRange= hMax - hMin;
+  const pSev  = ((sevH - hMin) / hRange * 100).toFixed(1) + '%';
+  const pMod  = ((modH - hMin) / hRange * 100).toFixed(1) + '%';
+  const pNeedle = Math.min(Math.max((height - hMin) / hRange * 100, 2), 97).toFixed(1) + '%';
+  document.getElementById('height-bar').style.setProperty('--h-sev', pSev);
+  document.getElementById('height-bar').style.setProperty('--h-mod', pMod);
+  document.getElementById('height-needle').style.left = pNeedle;
+
+  document.getElementById('height-note').innerHTML =
+    `बच्चे की ऊँचाई: <strong>${height} cm</strong> &nbsp;|&nbsp; ` +
+    `${ageMonths} months में सामान्य: <strong>${modH.toFixed(1)}–${p2H.toFixed(1)} cm</strong> &nbsp;|&nbsp; ` +
+    `Moderate Stunting cutoff: <strong>&lt; ${modH.toFixed(1)} cm</strong> &nbsp;|&nbsp; ` +
+    `Severe cutoff: <strong>&lt; ${sevH.toFixed(1)} cm</strong>`;
+
+  // Details
+  const wClsMap = {SAM:'sam-c',MAM:'mam-c',Normal:'ok-c',Overweight:'ow-c',Obese:'ow-c'};
+  const sClsMap = {'Severe Stunting':'stunt-sev-c','Moderate Stunting':'stunt-mod-c','Normal':'ok-c'};
+  document.getElementById('d-age').textContent      = ageStr;
+  document.getElementById('d-table').textContent    = tblName;
+  document.getElementById('d-height').textContent   = height + ' cm';
+  document.getElementById('d-weight').textContent   = weight + ' kg';
+  document.getElementById('d-sam-cut').textContent  = samCut.toFixed(3) + ' kg';
+  document.getElementById('d-mam-cut').textContent  = mamCut.toFixed(3) + ' kg';
+  document.getElementById('d-norm-cut').textContent = normCut.toFixed(3) + ' kg';
+  document.getElementById('d-exp-height').textContent = modH.toFixed(1) + ' – ' + p2H.toFixed(1) + ' cm';
+  document.getElementById('d-stunt-cut').textContent  = '< ' + sevH.toFixed(1) + ' cm (Severe), < ' + modH.toFixed(1) + ' cm (Moderate)';
+  document.getElementById('d-oedema').textContent   = oe ? '⚠️ हाँ / Yes → SAM' : '✓ नहीं / No';
+  document.getElementById('d-oedema').className     = 'dt-val ' + (oe ? 'sam-c' : 'ok-c');
+  document.getElementById('d-wasting').textContent  = wIcon + ' ' + wResult;
+  document.getElementById('d-wasting').className    = 'dt-val ' + (wClsMap[wResult]||'ok-c');
+  document.getElementById('d-stunting').textContent = sIcon + ' ' + sResult;
+  document.getElementById('d-stunting').className   = 'dt-val ' + (sClsMap[sResult]||'ok-c');
+
+  // Advice — combined wasting + stunting
+  const wAdv = {
+    SAM: '⚠️ Wasting: SAM — तुरंत NRC रेफर करें, RUTF दें',
+    MAM: '⚡ Wasting: MAM — पूरक पोषण कार्यक्रम में शामिल करें',
+    Normal: '✅ Wasting: Normal — नियमित निगरानी जारी रखें',
+    Overweight: '⚠️ Wasting: Overweight — आहार सलाह लें',
+    Obese: '🔴 Wasting: Obese — तुरंत डॉक्टर से मिलें'
+  };
+  const sAdv = {
+    'Severe Stunting': '🔴 Stunting: Severe — NRC रेफर, दीर्घकालिक पोषण योजना बनाएँ',
+    'Moderate Stunting': '🟡 Stunting: Moderate — आहार में विविधता बढ़ाएँ, मासिक जाँच करें',
+    'Normal': '✅ Stunting: Normal — ऊँचाई उम्र के अनुसार सामान्य है'
+  };
+  document.getElementById('adv-text').textContent =
+    (wAdv[wResult] || '') + '\n\n' + (sAdv[sResult] || '') +
+    '\n\nAnganwadi register में दर्ज करें।';
+
+  document.getElementById('result-wrap').classList.add('show');
+  setTimeout(() => document.getElementById('result-wrap').scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
+}
+
+function resetForm() {
+  ['inp-name','inp-dob','inp-height','inp-weight'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('err');
+  });
+  ['err-name','err-dob','err-gender','err-height','err-weight','err-oedema'].forEach(id =>
+    document.getElementById(id).classList.remove('show'));
+  gdr = null; oe = null; ageMonths = null;
+  document.getElementById('btn-boy').classList.remove('sel');
+  document.getElementById('btn-girl').classList.remove('sel');
+  document.getElementById('btn-oe-y').classList.remove('sel');
+  document.getElementById('btn-oe-n').classList.remove('sel');
+  document.getElementById('age-box').classList.remove('show');
+  document.getElementById('age-warn').classList.remove('show');
+  document.getElementById('range-box').classList.remove('show');
+  document.getElementById('result-wrap').classList.remove('show');
+  document.getElementById('inp-name').focus();
+}
+
+// PWA
+let dp;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); dp=e; document.getElementById('ib').classList.add('show'); });
+document.getElementById('ib-btn').addEventListener('click', async()=>{ if(dp){ dp.prompt(); await dp.userChoice; dp=null; document.getElementById('ib').classList.remove('show'); }});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW OK'))
+      .catch(e => console.log('SW error', e));
+  });
+}
+</script>
+</body>
+</html>
