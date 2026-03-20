@@ -6,13 +6,20 @@
   "start_url": "https://chhatarpalsingh334879-bit.github.io/poshan-sam-mam-app/index.html",
   "scope": "https://chhatarpalsingh334879-bit.github.io/poshan-sam-mam-app/",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "window-controls-overlay"
+  ],
   "background_color": "#1B5E20",
   "theme_color": "#1B5E20",
   "orientation": "portrait-primary",
   "lang": "hi-IN",
   "dir": "ltr",
-  "categories": ["health", "medical"],
+  "categories": [
+    "health",
+    "medical"
+  ],
   "prefer_related_applications": false,
   "icons": [
     {
